@@ -8,6 +8,8 @@ public const HC_ACTION               = 0
 
 global keyboard_ev as IKeyboardEvent
 
+global hh as long
+
 '
 ' TODO: should probably use longPtr etc.
 '
@@ -195,11 +197,13 @@ function startLowLevelKeyboardHook() as long ' {
          GetModuleHandle(vbNullString)          , _
          0 )
 
+    hh = startLowLevelKeyboardHook
     debug.print "Hook started, startLowLevelKeyboardHook = " & startLowLevelKeyboardHook
 
 end function ' }
 
-function endKeyboardHook(byVal hh as long) as boolean ' {
+function endKeyboardHook() as boolean ' {
+' function endKeyboardHook(byVal hh as long) as boolean
 
 '   if hh <> 0 then
        endKeyboardHook = UnhookWindowsHookEx(hh)
@@ -267,7 +271,17 @@ function LowLevelKeyboardProc(byVal nCode as Long, byVal wParam as long, lParam 
        exit function
     end if
 
-    if not kev.ev(vk_keyCode := lparam.vkCode, down := lparam.flags and 256, alt := lparam.flags and 32 ) then ' {
+    debug.print("lParam.flags: " & (lParam.flags and   1) & ", " & _
+                                   (lParam.flags and   2) & ", " & _
+                                   (lParam.flags and   4) & ", " & _
+                                   (lParam.flags and   8) & ", " & _
+                                   (lParam.flags and  16) & ", " & _
+                                   (lParam.flags and  32) & ", " & _
+                                   (lParam.flags and  64) & ", " & _
+                                   (lParam.flags and 128) & ", " & _
+                                   (lParam.flags and 256))
+
+    if not keyboard_ev.ev(vk_keyCode := lParam.vkCode, down := not ((lParam.flags and 128) = 0), alt := lParam.flags and 32 ) then ' {
      '
      ' Event was not processed, pass it on:
      '

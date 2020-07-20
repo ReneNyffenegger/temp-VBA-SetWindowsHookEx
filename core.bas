@@ -181,6 +181,15 @@ public const VK_EXSEL                = &h0f8
 public const VK_PLAY                 = &h0fa
 public const VK_NONAME               = &h0fc ' }
 
+sub sss() ' {
+    startLowLevelKeyboardHook
+end sub ' }
+
+sub eee() ' {
+    endKeyboardHook
+end sub ' }
+
+
 function startLowLevelKeyboardHook() as long ' {
 
 '   call setHook(hookHandle, WH_KEYBOARD_LL, addressOf LowLevelKeyboardProc)
@@ -271,17 +280,19 @@ function LowLevelKeyboardProc(byVal nCode as Long, byVal wParam as long, lParam 
        exit function
     end if
 
-    debug.print("lParam.flags: " & (lParam.flags and   1) & ", " & _
-                                   (lParam.flags and   2) & ", " & _
-                                   (lParam.flags and   4) & ", " & _
-                                   (lParam.flags and   8) & ", " & _
-                                   (lParam.flags and  16) & ", " & _
-                                   (lParam.flags and  32) & ", " & _
-                                   (lParam.flags and  64) & ", " & _
-                                   (lParam.flags and 128) & ", " & _
-                                   (lParam.flags and 256))
+'   debug.print("lParam.flags: " & (lParam.flags and   1) & ", " & _
+'                                  (lParam.flags and   2) & ", " & _
+'                                  (lParam.flags and   4) & ", " & _
+'                                  (lParam.flags and   8) & ", " & _
+'                                  (lParam.flags and  16) & ", " & _
+'                                  (lParam.flags and  32) & ", " & _
+'                                  (lParam.flags and  64) & ", " & _
+'                                  (lParam.flags and 128) & ", " & _
+'                                  (lParam.flags and 256))
 
-    if not keyboard_ev.ev(vk_keyCode := lParam.vkCode, down := not ((lParam.flags and 128) = 0), alt := lParam.flags and 32 ) then ' {
+'   if not keyboard_ev.ev(vk_keyCode := lParam.vkCode, down    := not ((lParam.flags and 128) = 0), alt := lParam.flags and 32 ) then
+    if not keyboard_ev.ev(vk_keyCode := lParam.vkCode, pressed := not   lParam.flags and 128      , alt := lParam.flags and 32, scanCode := lParam.scanCode, time := lParam.time) then
+' {
      '
      ' Event was not processed, pass it on:
      '
